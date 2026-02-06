@@ -208,25 +208,25 @@ curl -X POST http://localhost:5000/api/contact \
 
 ### Rooms
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/rooms` | Get all active rooms |
-| GET | `/api/rooms/featured` | Get featured rooms (homepage) |
-| GET | `/api/rooms/<slug>` | Get single room by slug |
-| GET | `/api/rooms/type/<type>` | Get rooms by type |
+| Method | Endpoint                 | Description                   |
+| ------ | ------------------------ | ----------------------------- |
+| GET    | `/api/rooms`             | Get all active rooms          |
+| GET    | `/api/rooms/featured`    | Get featured rooms (homepage) |
+| GET    | `/api/rooms/<slug>`      | Get single room by slug       |
+| GET    | `/api/rooms/type/<type>` | Get rooms by type             |
 
 ### Inquiries
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/inquiries` | Submit booking inquiry |
-| POST | `/api/inquiries/event` | Submit event inquiry |
+| Method | Endpoint               | Description            |
+| ------ | ---------------------- | ---------------------- |
+| POST   | `/api/inquiries`       | Submit booking inquiry |
+| POST   | `/api/inquiries/event` | Submit event inquiry   |
 
 ### Contact
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/contact` | Submit contact form |
+| Method | Endpoint       | Description         |
+| ------ | -------------- | ------------------- |
+| POST   | `/api/contact` | Submit contact form |
 
 ## 🗄️ Database Schema
 

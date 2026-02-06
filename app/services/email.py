@@ -1,6 +1,7 @@
 """
 Email service for sending notifications about inquiries and contacts.
 """
+
 from flask import current_app
 from flask_mail import Message
 from app import mail
@@ -9,13 +10,13 @@ from app import mail
 def send_inquiry_email(inquiry):
     """
     Send email notification for a new room booking inquiry.
-    
+
     Args:
         inquiry: Inquiry object
     """
     # Email to business owner
     subject = f"New Booking Inquiry - {inquiry.name}"
-    
+
     room_info = ""
     if inquiry.room:
         room_info = f"""
@@ -24,7 +25,7 @@ Room Details:
 - Type: {inquiry.room.type}
 - Price: KSh {inquiry.room.price_per_night:,}/night
 """
-    
+
     dates_info = ""
     if inquiry.check_in and inquiry.check_out:
         dates_info = f"""
@@ -33,7 +34,7 @@ Dates:
 - Check-out: {inquiry.check_out.strftime('%B %d, %Y')}
 - Guests: {inquiry.guests or 'Not specified'}
 """
-    
+
     body = f"""
 You have received a new booking inquiry from WIMA Serenity Gardens website.
 
@@ -50,16 +51,16 @@ Message:
 This is an automated message from WIMA Serenity Gardens booking system.
 Reply directly to this email to respond to the guest.
 """
-    
+
     msg = Message(
         subject=subject,
-        recipients=[current_app.config['BUSINESS_EMAIL']],
+        recipients=[current_app.config["BUSINESS_EMAIL"]],
         reply_to=inquiry.email,
-        body=body
+        body=body,
     )
-    
+
     mail.send(msg)
-    
+
     # Confirmation email to guest
     guest_subject = "Thank you for your inquiry - WIMA Serenity Gardens"
     guest_body = f"""
@@ -88,30 +89,28 @@ WIMA Serenity Gardens
 Guest House | Leisure Gardens | Event Venue
 Kericho, Kenya
 """
-    
+
     guest_msg = Message(
-        subject=guest_subject,
-        recipients=[inquiry.email],
-        body=guest_body
+        subject=guest_subject, recipients=[inquiry.email], body=guest_body
     )
-    
+
     mail.send(guest_msg)
 
 
 def send_event_inquiry_email(event_inquiry):
     """
     Send email notification for a new event venue inquiry.
-    
+
     Args:
         event_inquiry: EventInquiry object
     """
     # Email to business owner
     subject = f"New Event Inquiry - {event_inquiry.event_type.title()}"
-    
+
     venue_info = ""
     if event_inquiry.venue_preference:
         venue_info = f"- Venue Preference: {event_inquiry.venue_preference}\n"
-    
+
     body = f"""
 You have received a new event venue inquiry from WIMA Serenity Gardens website.
 
@@ -132,16 +131,16 @@ Message:
 This is an automated message from WIMA Serenity Gardens booking system.
 Reply directly to this email to respond to the client.
 """
-    
+
     msg = Message(
         subject=subject,
-        recipients=[current_app.config['BUSINESS_EMAIL']],
+        recipients=[current_app.config["BUSINESS_EMAIL"]],
         reply_to=event_inquiry.email,
-        body=body
+        body=body,
     )
-    
+
     mail.send(msg)
-    
+
     # Confirmation email to client
     client_subject = "Thank you for your event inquiry - WIMA Serenity Gardens"
     client_body = f"""
@@ -175,20 +174,18 @@ WIMA Serenity Gardens
 Guest House | Leisure Gardens | Event Venue
 Kericho, Kenya
 """
-    
+
     client_msg = Message(
-        subject=client_subject,
-        recipients=[event_inquiry.email],
-        body=client_body
+        subject=client_subject, recipients=[event_inquiry.email], body=client_body
     )
-    
+
     mail.send(client_msg)
 
 
 def send_contact_email(name, email, phone, subject, message):
     """
     Send email notification for a general contact form submission.
-    
+
     Args:
         name: Contact's name
         email: Contact's email
@@ -198,7 +195,7 @@ def send_contact_email(name, email, phone, subject, message):
     """
     # Email to business owner
     email_subject = f"New Contact Form Message - {subject}"
-    
+
     body = f"""
 You have received a new message from the WIMA Serenity Gardens contact form.
 
@@ -215,16 +212,16 @@ Message:
 This is an automated message from WIMA Serenity Gardens website.
 Reply directly to this email to respond to the sender.
 """
-    
+
     msg = Message(
         subject=email_subject,
-        recipients=[current_app.config['BUSINESS_EMAIL']],
+        recipients=[current_app.config["BUSINESS_EMAIL"]],
         reply_to=email,
-        body=body
+        body=body,
     )
-    
+
     mail.send(msg)
-    
+
     # Confirmation email to sender
     confirmation_subject = "Thank you for contacting WIMA Serenity Gardens"
     confirmation_body = f"""
@@ -250,11 +247,9 @@ WIMA Serenity Gardens
 Guest House | Leisure Gardens | Event Venue
 Kericho, Kenya
 """
-    
+
     confirmation_msg = Message(
-        subject=confirmation_subject,
-        recipients=[email],
-        body=confirmation_body
+        subject=confirmation_subject, recipients=[email], body=confirmation_body
     )
-    
+
     mail.send(confirmation_msg)
