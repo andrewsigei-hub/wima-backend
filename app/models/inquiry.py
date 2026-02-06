@@ -48,12 +48,12 @@ class Inquiry(db.Model):
             'phone': self.phone,
             'inquiry_type': self.inquiry_type,
             'room_id': self.room_id,
-            'check_in': self.check_in.isoformat() if self.check_in else None,
-            'check_out': self.check_out.isoformat() if self.check_out else None,
+            'check_in': self.check_in.strftime('%d-%m-%Y') if self.check_in else None,
+            'check_out': self.check_out.strftime('%d-%m-%Y') if self.check_out else None,
             'guests': self.guests,
             'message': self.message,
             'status': self.status,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.strftime('%d-%m-%Y') if self.created_at else None
         }
         
         if include_room and self.room:

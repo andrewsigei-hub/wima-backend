@@ -40,12 +40,12 @@ class EventInquiry(db.Model):
             'email': self.email,
             'phone': self.phone,
             'event_type': self.event_type,
-            'event_date': self.event_date.isoformat() if self.event_date else None,
+            'event_date': self.event_date.strftime('%d-%m-%Y') if self.event_date else None,
             'guest_count': self.guest_count,
             'venue_preference': self.venue_preference,
             'message': self.message,
             'status': self.status,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.strftime('%d-%m-%Y') if self.created_at else None
         }
     
     @classmethod

@@ -24,8 +24,8 @@ def create_inquiry():
             "phone": "+254700000000",
             "inquiry_type": "booking",
             "room_id": 1,
-            "check_in": "2026-03-15",
-            "check_out": "2026-03-17",
+            "check_in": "15-03-2026",
+            "check_out": "17-03-2026",
             "guests": 2,
             "message": "I would like to book this room..."
         }
@@ -67,20 +67,20 @@ def create_inquiry():
         check_out = None
         if data.get('check_in'):
             try:
-                check_in = datetime.strptime(data['check_in'], '%Y-%m-%d').date()
+                check_in = datetime.strptime(data['check_in'], '%d-%m-%Y').date()
             except ValueError:
                 return jsonify({
                     'success': False,
-                    'error': 'Invalid check_in date format. Use YYYY-MM-DD'
+                    'error': 'Invalid check_in date format. Use DD-MM-YYYY'
                 }), 400
         
         if data.get('check_out'):
             try:
-                check_out = datetime.strptime(data['check_out'], '%Y-%m-%d').date()
+                check_out = datetime.strptime(data['check_out'], '%d-%m-%Y').date()
             except ValueError:
                 return jsonify({
                     'success': False,
-                    'error': 'Invalid check_out date format. Use YYYY-MM-DD'
+                    'error': 'Invalid check_out date format. Use DD-MM-YYYY'
                 }), 400
         
         # Validate date logic
@@ -138,7 +138,7 @@ def create_event_inquiry():
             "email": "jane@example.com",
             "phone": "+254700000000",
             "event_type": "wedding",
-            "event_date": "2026-06-20",
+            "event_date": "20-06-2026",
             "guest_count": 150,
             "venue_preference": "field_1",
             "message": "I would like to book the venue for..."
@@ -169,11 +169,11 @@ def create_event_inquiry():
         
         # Parse event date
         try:
-            event_date = datetime.strptime(data['event_date'], '%Y-%m-%d').date()
+            event_date = datetime.strptime(data['event_date'], '%d-%m-%Y').date()
         except ValueError:
             return jsonify({
                 'success': False,
-                'error': 'Invalid event_date format. Use YYYY-MM-DD'
+                'error': 'Invalid event_date format. Use DD-MM-YYYY'
             }), 400
         
         # Validate event date is in the future
