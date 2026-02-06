@@ -32,6 +32,8 @@ def create_app(config_name='development'):
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
+
+    from app.models import room, inquiry, event_inquiry  # Import models to register with SQLAlchemy
     CORS(app, resources={
         r"/api/*": {
             "origins": ["http://localhost:5173", "http://localhost:3000"],
