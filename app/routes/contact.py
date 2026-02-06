@@ -1,33 +1,24 @@
 """
-Inquiries routes - API endpoints for handling inquiries and bookings.
+Contact routes - API endpoints for general contact form.
 """
 from flask import Blueprint, jsonify, request
-from datetime import datetime
-from app.models.inquiry import Inquiry
-from app.models.event_inquiry import EventInquiry
-from app.models.room import Room
-from app import db
-from app.services.email import send_inquiry_email, send_event_inquiry_email
+from app.services.email import send_contact_email
 
-inquiries_bp = Blueprint('inquiries', __name__)
+contact_bp = Blueprint('contact', __name__)
 
 
-@inquiries_bp.route('', methods=['POST'])
-def create_inquiry():
+@contact_bp.route('', methods=['POST'])
+def submit_contact():
     """
-    Create a new room booking inquiry.
+    Submit a general contact form message.
     
     Expected JSON:
         {
             "name": "John Doe",
             "email": "john@example.com",
             "phone": "+254700000000",
-            "inquiry_type": "booking",
-            "room_id": 1,
-            "check_in": "15-03-2026",
-            "check_out": "17-03-2026",
-            "guests": 2,
-            "message": "I would like to book this room..."
+            "subject": "General Inquiry",
+            "message": "I have a question about..."
         }
     
     Returns:
@@ -37,121 +28,7 @@ def create_inquiry():
         data = request.get_json()
         
         # Validate required fields
-        required_fields = ['name', 'email', 'phone', 'inquiry_type', 'message']
-        missing_fields = [field for field in required_fields if not data.get(field)]
-        
-        if missing_fields:
-            return jsonify({
-                'success': False,
-                'error': f'Missing required fields: {", ".join(missing_fields)}'
-            }), 400
-        
-        # Validate email format (basic)
-        if '@' not in data['email']:
-            return jsonify({
-                'success': False,
-                'error': 'Invalid email format'
-            }), 400
-        
-        # If room_id is provided, verify it exists
-        if data.get('room_id'):
-            room = Room.query.get(data['room_id'])
-            if not room or not room.is_active:
-                return jsonify({
-                    'success': False,
-                    'error': 'Invalid room ID'
-                }), 400
-        
-        # Parse dates if provided
-        check_in = None
-        check_out = None
-        if data.get('check_in'):
-            try:
-                check_in = datetime.strptime(data['check_in'], '%d-%m-%Y').date()
-            except ValueError:
-                return jsonify({
-                    'success': False,
-                    'error': 'Invalid check_in date format. Use DD-MM-YYYY'
-                }), 400
-        
-        if data.get('check_out'):
-            try:
-                check_out = datetime.strptime(data['check_out'], '%d-%m-%Y').date()
-            except ValueError:
-                return jsonify({
-                    'success': False,
-                    'error': 'Invalid check_out date format. Use DD-MM-YYYY'
-                }), 400
-        
-        # Validate date logic
-        if check_in and check_out and check_out <= check_in:
-            return jsonify({
-                'success': False,
-                'error': 'Check-out date must be after check-in date'
-            }), 400
-        
-        # Create inquiry
-        inquiry = Inquiry(
-            name=data['name'],
-            email=data['email'],
-            phone=data['phone'],
-            inquiry_type=data['inquiry_type'],
-            room_id=data.get('room_id'),
-            check_in=check_in,
-            check_out=check_out,
-            guests=data.get('guests'),
-            message=data['message']
-        )
-        
-        db.session.add(inquiry)
-        db.session.commit()
-        
-        # Send email notification
-        try:
-            send_inquiry_email(inquiry)
-        except Exception as email_error:
-            # Log error but don't fail the request
-            print(f"Failed to send email: {str(email_error)}")
-        
-        return jsonify({
-            'success': True,
-            'message': 'Inquiry submitted successfully',
-            'inquiry': inquiry.to_dict()
-        }), 201
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-
-@inquiries_bp.route('/event', methods=['POST'])
-def create_event_inquiry():
-    """
-    Create a new event venue inquiry.
-    
-    Expected JSON:
-        {
-            "name": "Jane Smith",
-            "email": "jane@example.com",
-            "phone": "+254700000000",
-            "event_type": "wedding",
-            "event_date": "20-06-2026",
-            "guest_count": 150,
-            "venue_preference": "field_1",
-            "message": "I would like to book the venue for..."
-        }
-    
-    Returns:
-        JSON success response or validation errors
-    """
-    try:
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = ['name', 'email', 'phone', 'event_type', 'event_date', 'guest_count', 'message']
+        required_fields = ['name', 'email', 'message']
         missing_fields = [field for field in required_fields if not data.get(field)]
         
         if missing_fields:
@@ -167,62 +44,36 @@ def create_event_inquiry():
                 'error': 'Invalid email format'
             }), 400
         
-        # Parse event date
-        try:
-            event_date = datetime.strptime(data['event_date'], '%d-%m-%Y').date()
-        except ValueError:
+        # Validate message length
+        if len(data['message'].strip()) < 10:
             return jsonify({
                 'success': False,
-                'error': 'Invalid event_date format. Use DD-MM-YYYY'
+                'error': 'Message must be at least 10 characters long'
             }), 400
         
-        # Validate event date is in the future
-        if event_date < datetime.now().date():
-            return jsonify({
-                'success': False,
-                'error': 'Event date must be in the future'
-            }), 400
-        
-        # Validate guest count
+        # Send email
         try:
-            guest_count = int(data['guest_count'])
-            if guest_count <= 0:
-                raise ValueError
-        except (ValueError, TypeError):
+            send_contact_email(
+                name=data['name'],
+                email=data['email'],
+                phone=data.get('phone', 'Not provided'),
+                subject=data.get('subject', 'General Inquiry'),
+                message=data['message']
+            )
+            
             return jsonify({
-                'success': False,
-                'error': 'Guest count must be a positive number'
-            }), 400
-        
-        # Create event inquiry
-        event_inquiry = EventInquiry(
-            name=data['name'],
-            email=data['email'],
-            phone=data['phone'],
-            event_type=data['event_type'],
-            event_date=event_date,
-            guest_count=guest_count,
-            venue_preference=data.get('venue_preference'),
-            message=data['message']
-        )
-        
-        db.session.add(event_inquiry)
-        db.session.commit()
-        
-        # Send email notification
-        try:
-            send_event_inquiry_email(event_inquiry)
+                'success': True,
+                'message': 'Your message has been sent successfully. We will get back to you soon!'
+            }), 200
+            
         except Exception as email_error:
-            print(f"Failed to send email: {str(email_error)}")
-        
-        return jsonify({
-            'success': True,
-            'message': 'Event inquiry submitted successfully',
-            'inquiry': event_inquiry.to_dict()
-        }), 201
+            print(f"Failed to send contact email: {str(email_error)}")
+            return jsonify({
+                'success': False,
+                'error': 'Failed to send message. Please try again or contact us directly.'
+            }), 500
         
     except Exception as e:
-        db.session.rollback()
         return jsonify({
             'success': False,
             'error': str(e)
