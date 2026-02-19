@@ -32,8 +32,23 @@ def create_app(config_name='development'):
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
-
-    from app.models import room, inquiry, event_inquiry  # Import models to register with SQLAlchemy
+    
+    # Import models to register with SQLAlchemy
+    from app.models import room, inquiry, event_inquiry
+    
+    # Initialize logging (do this early so other modules can use it)
+    from app.utils.logger import configure_logging
+    configure_logging(app)
+    
+    # Initialize error handlers
+    from app.utils.errors import register_error_handlers
+    register_error_handlers(app)
+    
+    # Initialize rate limiter
+    from app.utils.rate_limit import init_rate_limiter
+    init_rate_limiter(app)
+    
+    # Configure CORS
     CORS(app, resources={
         r"/api/*": {
             "origins": ["http://localhost:5173", "http://localhost:3000"],
@@ -55,5 +70,7 @@ def create_app(config_name='development'):
     @app.route('/api/health')
     def health_check():
         return {'status': 'healthy', 'service': 'WIMA Serenity Gardens API'}, 200
+    
+    app.logger.info('🚀 WIMA Serenity Gardens API initialized successfully')
     
     return app
