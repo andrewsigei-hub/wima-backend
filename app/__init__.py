@@ -61,10 +61,13 @@ def create_app(config_name='development'):
     from app.routes.rooms import rooms_bp
     from app.routes.inquiries import inquiries_bp
     from app.routes.contact import contact_bp
+    from app.routes.auth import auth_bp  
+
     
     app.register_blueprint(rooms_bp, url_prefix='/api/rooms')
     app.register_blueprint(inquiries_bp, url_prefix='/api/inquiries')
     app.register_blueprint(contact_bp, url_prefix='/api/contact')
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
     
     # Health check route
     @app.route('/api/health')
