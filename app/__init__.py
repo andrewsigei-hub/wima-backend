@@ -35,7 +35,7 @@ def create_app(config_name="development"):
     mail.init_app(app)
 
     # Import models to register with SQLAlchemy
-    from app.models import room, inquiry, event_inquiry
+    from app.models import room, inquiry, event_inquiry, package
 
     # Initialize logging (do this early so other modules can use it)
     from app.utils.logger import configure_logging
@@ -70,12 +70,14 @@ def create_app(config_name="development"):
     from app.routes.contact import contact_bp
     from app.routes.auth import auth_bp
     from app.routes.admin import admin_bp
+    from app.routes.packages import packages_bp
 
     app.register_blueprint(rooms_bp, url_prefix="/api/rooms")
     app.register_blueprint(inquiries_bp, url_prefix="/api/inquiries")
     app.register_blueprint(contact_bp, url_prefix="/api/contact")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(admin_bp, url_prefix="/api/admin")
+    app.register_blueprint(packages_bp, url_prefix="/api/packages")
 
     # Health check route
     @app.route("/api/health")
