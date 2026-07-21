@@ -11,8 +11,6 @@ class SerializerMixin:
     Handles date formatting in a single place.
     """
 
-    DATE_FORMAT = '%d-%m-%Y'
-
     # Override in subclasses to exclude columns from serialization
     serialize_exclude = ()
 
@@ -41,10 +39,8 @@ class SerializerMixin:
 
             if value is None and col.name in self.serialize_defaults:
                 value = self.serialize_defaults[col.name]()
-            elif isinstance(value, datetime):
-                value = value.strftime(self.DATE_FORMAT)
-            elif isinstance(value, date):
-                value = value.strftime(self.DATE_FORMAT)
+            elif isinstance(value, (datetime, date)):
+                value = value.isoformat()
 
             data[col.name] = value
 

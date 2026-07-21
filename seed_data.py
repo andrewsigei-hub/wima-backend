@@ -45,9 +45,9 @@ def seed_rooms():
                 "Complimentary toiletries",
             ],
             "images": [
-                "/images/rooms/deluxe-1-main.jpg",
-                # May add bathroom pic here in future
-                "/images/rooms/deluxe-1-view.jpg"
+                "/images/michelle-room/IMG_4973.JPG",
+                "/images/michelle-room/IMG_4974.JPG",
+                "/images/michelle-room/IMG_4975.JPG"
             ],
             "is_featured": True,
             "is_active": True
@@ -70,9 +70,9 @@ def seed_rooms():
                 "Complimentary toiletries",
             ],
             "images": [
-                "/images/rooms/deluxe-2-main.jpg",
-                "/images/rooms/deluxe-2-bed.jpg"
-                # Again may add bathroom pic here in future
+                "/images/single-room/IMG_4976.JPG",
+                "/images/single-room/IMG_4977.JPG",
+                "/images/single-room/IMG_4978.JPG"
             ],
             "is_featured": True,
             "is_active": True
@@ -94,10 +94,7 @@ def seed_rooms():
                 "Wardrobe",
                 "Complimentary toiletries",
             ],
-            "images": [
-                "/images/rooms/deluxe-3-main.jpg",
-                "/images/rooms/deluxe-3-view.jpg"
-            ],
+            "images": [],
             "is_featured": False,
             "is_active": True
         },
@@ -120,9 +117,10 @@ def seed_rooms():
                 "Complimentary toiletries"
             ],
             "images": [
-                "/images/rooms/double-main.jpg",
-                "/images/rooms/double-bed.jpg",
-                "/images/rooms/double-bathroom.jpg"
+                "/images/double-room/IMG_4935.JPG",
+                "/images/double-room/IMG_4936.JPG",
+                "/images/double-room/IMG_4937.JPG",
+                "/images/double-room/IMG_4938.JPG"
             ],
             "is_featured": True,
             "is_active": True
@@ -151,9 +149,10 @@ def seed_rooms():
                 "Breakfast for 2 included"
             ],
             "images": [
-                "/images/rooms/executive-1-main.jpg",
-                "/images/rooms/executive-1-bathroom.jpg",
-                "/images/rooms/executive-1-balcony.jpg"
+                "/images/Master bedroom/IMG_4922.JPG",
+                "/images/Master bedroom/IMG_4923.JPG",
+                "/images/Master bedroom/IMG_4924.JPG",
+                "/images/Master bedroom/IMG_4925.JPG"
             ],
             "is_featured": True,
             "is_active": True
@@ -181,9 +180,10 @@ def seed_rooms():
                 "Breakfast for 2 included"
             ],
             "images": [
-                "/images/rooms/executive-2-main.jpg",
-                "/images/rooms/executive-2-bed.jpg",
-                "/images/rooms/executive-2-view.jpg"
+                "/images/andrew-room/IMG_4982.JPG",
+                "/images/andrew-room/IMG_4983.JPG",
+                "/images/andrew-room/IMG_4984.JPG",
+                "/images/andrew-room/IMG_4985.JPG"
             ],
             "is_featured": False,
             "is_active": True
@@ -215,10 +215,10 @@ def seed_rooms():
                 "Breakfast for 2 included"
             ],
             "images": [
-                "/images/rooms/cottage-exterior.jpg",
-                "/images/rooms/cottage-interior.jpg",
-                "/images/rooms/cottage-living.jpg",
-                "/images/rooms/cottage-patio.jpg"
+                "/images/cottage/IMG_4948.JPG",
+                "/images/cottage/IMG_4949.JPG",
+                "/images/cottage/IMG_4950.JPG",
+                "/images/cottage/IMG_4951.JPG"
             ],
             "is_featured": True,
             "is_active": True
@@ -236,11 +236,12 @@ def seed_rooms():
     for room_data in rooms_data:
         # Check if room already exists
         existing_room = Room.query.filter_by(slug=room_data['slug']).first()
-        
+
         if existing_room:
-            print(f"Room '{room_data['name']}' already exists, skipping...")
+            existing_room.images = room_data['images']
+            print(f"Room '{room_data['name']}' already exists, updated images...")
             continue
-        
+
         room = Room(**room_data)
         db.session.add(room)
         print(f"Added room: {room_data['name']}")
