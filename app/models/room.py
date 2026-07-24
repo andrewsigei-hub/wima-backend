@@ -40,8 +40,11 @@ class Room(db.Model, SerializerMixin):
     def __repr__(self):
         return f'<Room {self.name}>'
 
-    def to_dict(self, include_inquiries=False):
+    def to_dict(self, include_inquiries=False, include_is_active=False):
         data = super().to_dict()
+
+        if include_is_active:
+            data['is_active'] = self.is_active
 
         if include_inquiries:
             data['inquiries_count'] = self.inquiries.count()

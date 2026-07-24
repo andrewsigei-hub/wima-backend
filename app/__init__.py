@@ -2,6 +2,8 @@
 Flask application factory for WIMA Serenity Gardens backend.
 """
 
+import os
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -53,11 +55,20 @@ def create_app(config_name="development"):
     init_rate_limiter(app)
 
     # Configure CORS
+    # CORS_ORIGINS: comma-separated list of allowed frontend origins.
+    # Falls back to local dev origins when unset.
+    cors_origins = os.getenv("CORS_ORIGINS")
+    allowed_origins = (
+        [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
+        if cors_origins
+        else ["http://localhost:5173", "http://localhost:3000"]
+    )
+
     CORS(
         app,
         resources={
             r"/api/*": {
-                "origins": ["http://localhost:5173", "http://localhost:3000"],
+                "origins": allowed_origins,
                 "methods": ["GET", "POST", "PATCH", "DELETE"],
                 "allow_headers": ["Content-Type", "Authorization"],
             }

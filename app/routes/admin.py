@@ -8,7 +8,7 @@ from app import db
 from app.models.inquiry import Inquiry
 from app.models.event_inquiry import EventInquiry
 from app.models.room import Room
-from app.utils.auth import require_auth, require_admin, require_manager
+from app.utils.auth import require_auth, require_manager
 from app.utils.validators import validate_required_fields, sanitize_string
 from app.utils.errors import ValidationError, NotFoundError, DatabaseError
 from app.utils.rate_limit import limiter
@@ -600,7 +600,7 @@ def admin_get_all_rooms(current_user):
                 {
                     "success": True,
                     "count": len(rooms),
-                    "rooms": [room.to_dict() for room in rooms],
+                    "rooms": [room.to_dict(include_is_active=True) for room in rooms],
                 }
             ),
             200,
@@ -720,7 +720,7 @@ def create_room(current_user):
                 {
                     "success": True,
                     "message": "Room created successfully",
-                    "room": room.to_dict(),
+                    "room": room.to_dict(include_is_active=True),
                 }
             ),
             201,
@@ -754,7 +754,7 @@ def admin_get_room(current_user, room_id):
 
         current_app.logger.info(f"Room {room_id} viewed by {current_user.email}")
 
-        return jsonify({"success": True, "room": room.to_dict()}), 200
+        return jsonify({"success": True, "room": room.to_dict(include_is_active=True)}), 200
 
     except NotFoundError:
         raise
@@ -888,7 +888,7 @@ def update_room(current_user, room_id):
                 {
                     "success": True,
                     "message": "Room updated successfully",
-                    "room": room.to_dict(),
+                    "room": room.to_dict(include_is_active=True),
                 }
             ),
             200,
@@ -903,10 +903,10 @@ def update_room(current_user, room_id):
 
 
 @admin_bp.route("/rooms/<int:room_id>", methods=["DELETE"])
-@require_admin
+@require_manager
 def delete_room(current_user, room_id):
     """
-    Soft delete a room (admin only).
+    Soft delete a room (manager or admin only).
     Sets is_active to False instead of actually deleting.
 
     Returns:
@@ -964,7 +964,7 @@ def activate_room(current_user, room_id):
                 {
                     "success": True,
                     "message": "Room activated successfully",
-                    "room": room.to_dict(),
+                    "room": room.to_dict(include_is_active=True),
                 }
             ),
             200,
@@ -1006,7 +1006,7 @@ def toggle_room_featured(current_user, room_id):
                     "success": True,
                     "message": f"Room {status} successfully",
                     "is_featured": room.is_featured,
-                    "room": room.to_dict(),
+                    "room": room.to_dict(include_is_active=True),
                 }
             ),
             200,

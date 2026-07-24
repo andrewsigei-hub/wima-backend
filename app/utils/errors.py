@@ -110,6 +110,15 @@ def register_error_handlers(app):
             'error_type': 'method_not_allowed'
         }), 405
     
+    @app.errorhandler(429)
+    def handle_rate_limit(error):
+        app.logger.warning(f'Rate limit exceeded: {str(error)}')
+        return jsonify({
+            'success': False,
+            'error': 'Too many requests. Please try again later.',
+            'error_type': 'rate_limit_exceeded'
+        }), 429
+
     @app.errorhandler(500)
     def handle_internal_error(error):
         app.logger.error(f'Internal server error: {str(error)}')
