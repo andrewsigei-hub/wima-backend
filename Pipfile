@@ -13,6 +13,9 @@ psycopg2-binary = "*"
 python-dotenv = "*"
 gunicorn = "*"
 flask-limiter = "*"
+pyjwt = "*"
+bcrypt = "*"
+redis = "*"
 
 [dev-packages]
 

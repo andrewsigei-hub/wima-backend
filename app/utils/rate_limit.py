@@ -1,15 +1,19 @@
 """
 Rate limiting configuration to prevent abuse and spam.
 """
+import os
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 
-# Initialize limiter with remote address as key
+# In-memory storage only tracks requests seen by the single worker process
+# that handled them, so it under-counts (and under-protects) as soon as more
+# than one Gunicorn worker is running. Set RATELIMIT_STORAGE_URI to a shared
+# store (e.g. redis://host:6379) in any multi-worker deployment.
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["200 per day", "50 per hour"],
-    storage_uri="memory://",  # Use in-memory storage (use Redis in production for multiple workers)
+    storage_uri=os.getenv("RATELIMIT_STORAGE_URI", "memory://"),
 )
 
 
